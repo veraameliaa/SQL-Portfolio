@@ -21,4 +21,66 @@ WHERE
 GROUP BY
   email
 
---#2 Provide
+--#2 Provide 10 customer IDs with highest total purchases
+SELECT
+  customer_id,
+  SUM(total) AS total_pembelian
+FROM
+  `ecommerce.transaction`
+GROUP BY
+  customer_id
+ORDER BY
+  total_pembelian DESC
+LIMIT
+  10
+
+--#3 Provide some product IDs whose price is below 10000
+SELECT
+  id,
+  price
+FROM
+  `ecommerce.product`
+WHERE
+  price < 10000
+
+--#4 Provide 5 most purchased product IDs
+SELECT
+  product_id,
+  SUM(quantity) AS jumlah_terjual
+FROM
+  `ecommerce.transaction`
+GROUP BY
+  product_id
+ORDER BY
+  jumlah_terjual DESC
+LIMIT
+  5
+
+--#5 Provide monthly data of number of transactions, revenue, and number of products sold
+SELECT
+  DATE_TRUNC(DATE(created_at), MONTH) AS bulan,
+  COUNT(DISTINCT id) AS jumlah_transaksi,
+  SUM(total) AS pendapatan,
+  SUM(quantity) AS jumlah_produk
+FROM
+  `ecommerce.transaction`
+GROUP BY
+  bulan
+ORDER BY
+  bulan DESC
+
+--#6 Provide information on total spending and average spending per city
+SELECT
+  city,
+  SUM(total) AS total_belanja,
+  AVG(total) AS rerata_belanja
+FROM
+  `ecommerce.customer` AS a
+INNER JOIN
+  `ecommerce.transaction` AS b
+ON
+  a.id = b.customer_id
+GROUP BY
+  city
+
+--#7 Provide the number of customers with total spending above 200000 per store type
