@@ -69,18 +69,39 @@ GROUP BY
 ORDER BY
   bulan DESC
 
---#6 Provide information on total spending and average spending per city
+--#6 Provide information on total spending and average spending of the customers per city
 SELECT
   city,
-  SUM(total) AS total_belanja,
-  AVG(total) AS rerata_belanja
-FROM
-  `ecommerce.customer` AS a
-INNER JOIN
-  `ecommerce.transaction` AS b
-ON
-  a.id = b.customer_id
+  SUM(total) AS total_spending,
+  AVG(total) AS average_spending
+FROM (
+  SELECT
+    a.id AS customer_id,
+    a.city AS city,
+    SUM(b.total) AS total
+  FROM
+    `ecommerce.customer` AS a
+  LEFT JOIN
+    `ecommerce.transaction` AS b
+  ON
+    a.id = b.customer_id
+  GROUP BY
+    a.id,
+    a.city)
 GROUP BY
   city
 
 --#7 Provide the number of customers with total spending above 200000 per store type
+SELECT
+  type,
+  COUNT(DISTINCT customer_id) AS banyak_customer
+FROM
+  `ecommerce.transaction` AS a
+RIGHT JOIN
+  `ecommerce.store` AS b
+ON
+  a.store_id = b.id
+GROUP BY
+  type
+HAVING
+  SUM(total) > 200000
